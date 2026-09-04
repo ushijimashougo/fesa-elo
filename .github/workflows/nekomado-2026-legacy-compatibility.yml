@@ -17,13 +17,6 @@ jobs:
         with:
           path: fesa-elo
 
-      - name: Checkout pinned table-hub fixture
-        uses: actions/checkout@v4
-        with:
-          repository: ushijimashougo/table-hub-app
-          ref: 89cd3905ec0cc1181241a00360d1319b1ba88545
-          path: table-hub-app
-
       - name: Checkout pinned legacy implementation
         uses: actions/checkout@v4
         with:
@@ -51,7 +44,7 @@ jobs:
         working-directory: fesa-elo
         run: |
           node scripts/compatibility/nekomado-2026-legacy.mjs \
-            --fixture ../table-hub-app/tests/fixtures/fesa/nekomado/replay.json \
+            --fixture tests/compatibility/fixtures/nekomado-2026.json \
             --legacy-dir ../elo_rating \
             --year 2026 \
             --output .compatibility/nekomado-2026-legacy-report.json
