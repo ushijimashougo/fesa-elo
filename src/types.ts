@@ -66,6 +66,9 @@ export type FesaHandicap =
   | "SIX_PIECES";
 
 export type FesaGrade =
+  | "8_DAN"
+  | "7_DAN"
+  | "6_DAN"
   | "5_DAN"
   | "4_DAN"
   | "3_DAN"
