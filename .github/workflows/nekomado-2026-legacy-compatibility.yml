@@ -1,0 +1,65 @@
+name: Nekomado 2026 legacy compatibility
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "src/**"
+      - "scripts/compatibility/nekomado-2026-legacy.mjs"
+      - ".github/workflows/nekomado-2026-legacy-compatibility.yml"
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fesa-elo
+        uses: actions/checkout@v4
+        with:
+          path: fesa-elo
+
+      - name: Checkout pinned table-hub fixture
+        uses: actions/checkout@v4
+        with:
+          repository: ushijimashougo/table-hub-app
+          ref: 89cd3905ec0cc1181241a00360d1319b1ba88545
+          path: table-hub-app
+
+      - name: Checkout pinned legacy implementation
+        uses: actions/checkout@v4
+        with:
+          repository: kota/elo_rating
+          ref: c7adb145e1b98ce91458e4e50bdbbedc8059f771
+          path: elo_rating
+
+      - name: Install CLISP
+        run: sudo apt-get update && sudo apt-get install -y clisp
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: fesa-elo/package-lock.json
+
+      - name: Install and build fesa-elo
+        working-directory: fesa-elo
+        run: |
+          npm ci
+          npm run build
+
+      - name: Compare 2026 Nekomado tournaments
+        working-directory: fesa-elo
+        run: |
+          node scripts/compatibility/nekomado-2026-legacy.mjs \
+            --fixture ../table-hub-app/tests/fixtures/fesa/nekomado/replay.json \
+            --legacy-dir ../elo_rating \
+            --year 2026 \
+            --output .compatibility/nekomado-2026-legacy-report.json
+
+      - name: Upload comparison report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekomado-2026-legacy-report
+          path: fesa-elo/.compatibility/nekomado-2026-legacy-report.json
+          if-no-files-found: warn
