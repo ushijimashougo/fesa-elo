@@ -62,16 +62,67 @@ describe("calculateTournament", () => {
     expect(result.players[1]?.ratingAfter).toBe(1600);
   });
 
-  it("rejects handicap games until handicap calculation is implemented", () => {
+  it("applies handicap effects to both giver and receiver", () => {
+    const players = [
+      {
+        id: "a",
+        state: { rating: 1800, ratedGames: 20, bonusGamesUsed: 100 },
+      },
+      {
+        id: "b",
+        state: { rating: 1800, ratedGames: 20, bonusGamesUsed: 100 },
+      },
+    ];
+
+    const flat = calculateTournament({
+      players,
+      games: [
+        {
+          id: "flat",
+          playerAId: "a",
+          playerBId: "b",
+          result: "A_WIN",
+          rated: true,
+        },
+      ],
+    });
+
+    const handicap = calculateTournament({
+      players,
+      games: [
+        {
+          id: "rook",
+          playerAId: "a",
+          playerBId: "b",
+          result: "A_WIN",
+          rated: true,
+          handicap: {
+            type: "ROOK",
+            giverId: "a",
+          },
+        },
+      ],
+    });
+
+    const flatA = flat.players.find((player) => player.id === "a")!;
+    const flatB = flat.players.find((player) => player.id === "b")!;
+    const handicapA = handicap.players.find((player) => player.id === "a")!;
+    const handicapB = handicap.players.find((player) => player.id === "b")!;
+
+    expect(handicapA.ratingAfter!).toBeGreaterThan(flatA.ratingAfter!);
+    expect(handicapB.ratingAfter!).toBeGreaterThan(flatB.ratingAfter!);
+  });
+
+  it("rejects a handicap giver who is not in the game", () => {
     expect(() => calculateTournament({
       players: [
         {
           id: "a",
-          state: { rating: 1600, ratedGames: 20, bonusGamesUsed: 20 },
+          state: { rating: 1800, ratedGames: 20, bonusGamesUsed: 100 },
         },
         {
           id: "b",
-          state: { rating: 1600, ratedGames: 20, bonusGamesUsed: 20 },
+          state: { rating: 1800, ratedGames: 20, bonusGamesUsed: 100 },
         },
       ],
       games: [
@@ -81,10 +132,13 @@ describe("calculateTournament", () => {
           playerBId: "b",
           result: "A_WIN",
           rated: true,
-          handicap: "ROOK",
+          handicap: {
+            type: "ROOK",
+            giverId: "c",
+          },
         },
       ],
-    })).toThrow(/Handicap calculation is not implemented/);
+    })).toThrow(/does not participate/);
   });
 
   it("keeps an unrated non-playing participant unrated", () => {
