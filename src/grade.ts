@@ -1,6 +1,9 @@
 import type { FesaGrade, FesaGradeInfo } from "./types.js";
 
 const MIDPOINTS: Record<FesaGrade, number> = {
+  "8_DAN": 3000,
+  "7_DAN": 2760,
+  "6_DAN": 2540,
   "5_DAN": 2340,
   "4_DAN": 2160,
   "3_DAN": 2000,
