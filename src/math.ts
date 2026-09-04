@@ -3,6 +3,21 @@ export const OPPONENT_RATING_FLOOR = 400;
 export const DEVELOPMENT_BONUS_LIMIT = 100;
 export const DEVELOPMENT_BONUS_RATING_LIMIT = 1800;
 
+export function roundToNearestEven(value: number): number {
+  if (!Number.isFinite(value)) {
+    throw new Error("Cannot round a non-finite rating value");
+  }
+
+  const lower = Math.floor(value);
+  const fraction = value - lower;
+  const epsilon = 1e-12;
+
+  if (fraction < 0.5 - epsilon) return lower;
+  if (fraction > 0.5 + epsilon) return lower + 1;
+
+  return lower % 2 === 0 ? lower : lower + 1;
+}
+
 export function expectedScore(playerRating: number, opponentRating: number): number {
   const effectiveOpponent = Math.max(OPPONENT_RATING_FLOOR, opponentRating);
   return 1 / (1 + 10 ** ((effectiveOpponent - playerRating) / 400));
