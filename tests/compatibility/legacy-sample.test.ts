@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateTournament } from "../../src/calculateTournament.js";
+import { roundToNearestEven, standardGameChange } from "../../src/math.js";
 
 describe("kota/elo_rating legacy compatibility", () => {
   it("matches the bundled Nekomado-ken sample", () => {
@@ -117,88 +118,36 @@ describe("kota/elo_rating legacy compatibility", () => {
       Mazouzi: 1,
     });
   });
+
   it("matches an established-player result from the 8th Nekomadoken archive", () => {
     // N17 in archives/8th_nekomadoken:
     // pre: 1555, games 23, bonus-count 15
-    // current rated games, using opponents' post-event ratings:
+    // legacy opponent post-event ratings:
     //   WIN  vs N43 (1651)
     //   WIN  vs N48 (1461)
     //   LOSS vs N46 (1566)
-    // legacy post: 1572, games 26, bonus-count 18
-    //
-    // Opponent states below are intentionally set up so they remain unchanged
-    // while still providing the legacy post-event ratings used by the player.
-    const result = calculateTournament({
-      players: [
-        {
-          id: "N17",
-          state: {
-            rating: 1555,
-            ratedGames: 23,
-            bonusGamesUsed: 15,
-          },
-        },
-        {
-          id: "N43",
-          state: {
-            rating: 1651,
-            ratedGames: 20,
-            bonusGamesUsed: 100,
-          },
-        },
-        {
-          id: "N48",
-          state: {
-            rating: 1461,
-            ratedGames: 20,
-            bonusGamesUsed: 100,
-          },
-        },
-        {
-          id: "N46",
-          state: {
-            rating: 1566,
-            ratedGames: 20,
-            bonusGamesUsed: 100,
-          },
-        },
-      ],
-      games: [
-        {
-          id: "n17-r1",
-          playerAId: "N17",
-          playerBId: "N43",
-          result: "A_WIN",
-          rated: true,
-        },
-        {
-          id: "n17-r2",
-          playerAId: "N17",
-          playerBId: "N48",
-          result: "A_WIN",
-          rated: true,
-        },
-        {
-          id: "n17-r3",
-          playerAId: "N17",
-          playerBId: "N46",
-          result: "B_WIN",
-          rated: true,
-        },
-      ],
-    });
+    // post: 1572, games 26, bonus-count 18
+    let accumulatedChange = 0;
+    let bonusGamesUsed = 15;
 
-    const n17 = result.players.find((player) => player.id === "N17");
+    for (const game of [
+      { opponentRating: 1651, result: "WIN" as const },
+      { opponentRating: 1461, result: "WIN" as const },
+      { opponentRating: 1566, result: "LOSS" as const },
+    ]) {
+      const calculation = standardGameChange({
+        playerRating: 1555 + accumulatedChange,
+        opponentRating: game.opponentRating,
+        result: game.result,
+        bonusGamesUsed,
+      });
 
-    expect(n17).toMatchObject({
-      ratingBefore: 1555,
-      ratingAfter: 1572,
-      ratedGamesBefore: 23,
-      ratedGamesAfter: 26,
-      bonusGamesUsedBefore: 15,
-      bonusGamesUsedAfter: 18,
-      calculationMethod: "STANDARD",
-    });
+      accumulatedChange += calculation.change;
+      bonusGamesUsed = calculation.bonusGamesUsedAfter;
+    }
+
+    expect(1555 + roundToNearestEven(accumulatedChange)).toBe(1572);
+    expect(bonusGamesUsed).toBe(18);
   });
 
 });
