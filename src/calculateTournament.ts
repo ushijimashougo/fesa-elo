@@ -99,6 +99,28 @@ function calculatePlayer(args: {
   const { player } = args;
   const currentGames = ratedGamesForPlayer(args.games, player.id);
   const priorGames = player.state.priorRatedGames ?? [];
+
+  if (currentGames.length === 0) {
+    return {
+      id: player.id,
+      ...(player.state.rating !== undefined
+        ? {
+            ratingBefore: player.state.rating,
+            ratingAfter: player.state.rating,
+            ratingChange: 0,
+          }
+        : {}),
+      ratedGamesBefore: player.state.ratedGames,
+      ratedGamesAfter: player.state.ratedGames,
+      bonusGamesUsedBefore: player.state.bonusGamesUsed,
+      bonusGamesUsedAfter: player.state.bonusGamesUsed,
+      calculationMethod: "UNCHANGED",
+      ...(player.state.priorRatedGames !== undefined
+        ? { priorRatedGames: player.state.priorRatedGames }
+        : {}),
+    };
+  }
+
   const gradeGames =
     player.state.ratedGames === 0
       ? priorGradeGames(player.priorGrade)
@@ -252,7 +274,12 @@ export function calculateTournament(
 
     previousResults = results;
     opponentRatings = new Map(
-      results.map((result) => [result.id, result.ratingAfter]),
+      results.map((result) => [
+        result.id,
+        result.ratingAfter ?? initialGuess(
+          input.players.find((player) => player.id === result.id)!,
+        ),
+      ]),
     );
   }
 
