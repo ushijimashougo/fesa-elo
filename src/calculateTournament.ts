@@ -278,11 +278,12 @@ export function calculateTournament(
       }),
     );
 
+    const priorIteration = previousResults;
     if (
-      previousResults !== undefined &&
+      priorIteration !== undefined &&
       results.every(
         (result, index) =>
-          result.ratingAfter === previousResults[index]?.ratingAfter,
+          result.ratingAfter === priorIteration[index]?.ratingAfter,
       )
     ) {
       return { players: results };
