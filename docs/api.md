@@ -77,7 +77,9 @@ export type PriorRatedGame = {
 }
 ```
 
-`opponentRating` means the opponent's **post-event rating for that historical event**, not the opponent's current rating today.
+`opponentRating` means the opponent's **effective post-event rating used by the FESA calculation for that historical game**, not the opponent's current rating today.
+
+For a flat game this is the opponent's post-event rating. For a handicap game this is the handicap-adjusted opponent rating that was used for that player's performance-rating calculation.
 
 The caller is responsible for storing and supplying these snapshots.
 
@@ -96,7 +98,10 @@ export type FesaGame = {
 
   rated?: boolean
 
-  handicap?: FesaHandicap
+  handicap?: {
+    type: FesaHandicap
+    giverId: string
+  }
 }
 ```
 
