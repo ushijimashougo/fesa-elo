@@ -1,5 +1,10 @@
 import { getGradeInfo } from "./grade.js";
-import { HARD_RATING_FLOOR, OPPONENT_RATING_FLOOR, resultScore } from "./math.js";
+import {
+  HARD_RATING_FLOOR,
+  OPPONENT_RATING_FLOOR,
+  resultScore,
+  roundToNearestEven,
+} from "./math.js";
 import type { FesaGrade, FesaResult, PriorRatedGame } from "./types.js";
 
 export type PerformanceGame = {
@@ -90,7 +95,10 @@ export function calculatePerformanceRating(
     }
   }
 
-  return Math.max(HARD_RATING_FLOOR, Math.round((low + high) / 2));
+  return Math.max(
+    HARD_RATING_FLOOR,
+    roundToNearestEven((low + high) / 2),
+  );
 }
 
 export function toPersistedPriorGames(
