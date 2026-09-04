@@ -82,7 +82,12 @@ export type FesaGrade =
   | "12_KYU"
   | "13_KYU"
   | "14_KYU"
-  | "15_KYU";
+  | "15_KYU"
+  | "16_KYU"
+  | "17_KYU"
+  | "18_KYU"
+  | "19_KYU"
+  | "20_KYU";
 
 export type FesaGradeInfo = {
   midpoint: number;
