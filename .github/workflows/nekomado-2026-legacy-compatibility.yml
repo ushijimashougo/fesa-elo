@@ -31,13 +31,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: fesa-elo/package-lock.json
 
       - name: Install and build fesa-elo
         working-directory: fesa-elo
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Compare 2026 Nekomado tournaments
