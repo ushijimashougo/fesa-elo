@@ -1,6 +1,6 @@
 export type FesaResult = "WIN" | "LOSS" | "DRAW";
 
-export type FesaCalculationMethod = "STANDARD" | "PERFORMANCE";
+export type FesaCalculationMethod = "STANDARD" | "PERFORMANCE" | "UNCHANGED";
 
 export type PriorRatedGame = {
   opponentRating: number;
@@ -37,7 +37,7 @@ export type FesaTournamentInput = {
 export type FesaPlayerResult = {
   id: string;
   ratingBefore?: number;
-  ratingAfter: number;
+  ratingAfter?: number;
   ratingChange?: number;
   ratedGamesBefore: number;
   ratedGamesAfter: number;
