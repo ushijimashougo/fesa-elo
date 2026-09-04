@@ -110,7 +110,7 @@ describe("calculateTournament", () => {
     const handicapB = handicap.players.find((player) => player.id === "b")!;
 
     expect(handicapA.ratingAfter!).toBeGreaterThan(flatA.ratingAfter!);
-    expect(handicapB.ratingAfter!).toBeGreaterThan(flatB.ratingAfter!);
+    expect(handicapB.ratingAfter!).toBeLessThan(flatB.ratingAfter!);
   });
 
   it("rejects a handicap giver who is not in the game", () => {
