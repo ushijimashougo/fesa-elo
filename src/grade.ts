@@ -21,6 +21,11 @@ const MIDPOINTS: Record<FesaGrade, number> = {
   "13_KYU": 600,
   "14_KYU": 520,
   "15_KYU": 440,
+  "16_KYU": 360,
+  "17_KYU": 280,
+  "18_KYU": 200,
+  "19_KYU": 120,
+  "20_KYU": 40,
 };
 
 export function getGradeInfo(grade: FesaGrade): FesaGradeInfo {
