@@ -5,9 +5,17 @@ import {
   kFactor,
   normalGameChange,
   standardGameChange,
+  roundToNearestEven,
 } from "../src/math.js";
 
 describe("core FESA Elo math", () => {
+  it("matches Common Lisp round-to-even behavior", () => {
+    expect(roundToNearestEven(1.5)).toBe(2);
+    expect(roundToNearestEven(2.5)).toBe(2);
+    expect(roundToNearestEven(-1.5)).toBe(-2);
+    expect(roundToNearestEven(-2.5)).toBe(-2);
+  });
+
   it("uses the standard 400-point Elo expectation", () => {
     expect(expectedScore(1600, 1600)).toBeCloseTo(0.5, 12);
     expect(expectedScore(1600, 2000)).toBeCloseTo(1 / 11, 12);
