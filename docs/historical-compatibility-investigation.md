@@ -215,3 +215,55 @@ The R135 investigation demonstrated why:
 The legacy execution archives are therefore a core part of the compatibility evidence base.
 
 They should be preserved upstream (or in a dedicated archival mirror if necessary), while this repository should retain normalized golden fixtures and explicit provenance.
+
+## 2026 Nekomado forward-compatibility validation
+
+The historical 2018 investigation is not used as the acceptance criterion for future operation.
+
+A dedicated forward-compatibility test was added using the 2026 Nekomado tournament data. The test gives the same normalized starting state and the same tournament results to:
+
+- the pinned legacy `kota/elo_rating` Common Lisp implementation,
+- the current `fesa-elo` TypeScript implementation.
+
+Pinned inputs:
+
+- Nekomado fixture provenance: `ushijimashougo/table-hub-app@89cd3905ec0cc1181a00360d1319b1ba88545`
+- legacy implementation: `kota/elo_rating@c7adb145e1b98ce91458e4e50bdbbedc8059f771`
+- normalized fixture: `tests/compatibility/fixtures/nekomado-2026.json`
+- runner: `scripts/compatibility/nekomado-2026-legacy.mjs`
+- workflow: `.github/workflows/nekomado-2026-legacy-compatibility.yml`
+
+For established players, the starting state intentionally matches the current Table Hub migration baseline:
+
+- `ratedGames = 9`
+- `bonusGamesUsed = 100`
+
+For provisional players, the test starts from the inferred prior grade and zero rated games, matching the migration model.
+
+The comparison checks, for every player after every tournament:
+
+- rating,
+- rated game count,
+- bonus-game count,
+- provisional/established state.
+
+### Result
+
+GitHub Actions run `33902800157` completed successfully.
+
+| Tournament | Participants | Rated games | Differences |
+| --- | ---: | ---: | ---: |
+| 2026-01 | 18 | 27 | 0 |
+| 2026-02 | 18 | 25 | 0 |
+| 2026-03 | 21 | 30 | 0 |
+| 2026-04 | 10 | 15 | 0 |
+| 2026-05 | 14 | 20 | 0 |
+| 2026-06 | 15 | 21 | 0 |
+| 2026-07 | 15 | 21 | 0 |
+| 2026-08 | 16 | 24 | 0 |
+
+**All eight tournaments matched exactly.**
+
+This is the primary compatibility evidence for forward operation: from the current normalized migration state, the TypeScript implementation produces the same tournament state transitions as the pinned legacy implementation for the complete available 2026 Nekomado sequence.
+
+This result does not resolve unexplained historical ledger differences in 2018. It demonstrates that those historical discrepancies are not evidence of a current forward-calculation incompatibility under the tested migration state.
