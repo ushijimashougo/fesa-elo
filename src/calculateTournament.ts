@@ -3,6 +3,7 @@ import {
   roundToNearestEven,
   standardGameChange,
 } from "./math.js";
+import { handicapRatingEffect } from "./handicap.js";
 import {
   calculatePerformanceRating,
   priorGradeGames,
@@ -73,12 +74,6 @@ function validateInput(input: FesaTournamentInput): void {
 
   const gameIds = new Set<string>();
   for (const game of input.games) {
-    if (game.handicap !== undefined) {
-      throw new Error(
-        `Handicap calculation is not implemented yet (game ${game.id})`,
-      );
-    }
-
     if (gameIds.has(game.id)) {
       throw new Error(`Duplicate game id: ${game.id}`);
     }
@@ -90,7 +85,58 @@ function validateInput(input: FesaTournamentInput): void {
     if (!playerIds.has(game.playerAId) || !playerIds.has(game.playerBId)) {
       throw new Error(`Game ${game.id} references an unknown player`);
     }
+
+    if (
+      game.handicap !== undefined &&
+      game.handicap.giverId !== game.playerAId &&
+      game.handicap.giverId !== game.playerBId
+    ) {
+      throw new Error(
+        `Handicap giver ${game.handicap.giverId} does not participate in game ${game.id}`,
+      );
+    }
   }
+}
+
+
+function effectiveOpponentRating(args: {
+  game: FesaGame;
+  player: FesaPlayer;
+  opponentRating: number;
+  iterationRatings: Map<string, number>;
+}): number {
+  const { game, player, opponentRating } = args;
+
+  if (game.handicap === undefined) {
+    return opponentRating;
+  }
+
+  const playerIsGiver = game.handicap.giverId === player.id;
+
+  if (playerIsGiver) {
+    const giverRating =
+      player.state.rating ??
+      args.iterationRatings.get(player.id);
+
+    if (giverRating === undefined) {
+      throw new Error(
+        `Missing handicap giver rating for player ${player.id}`,
+      );
+    }
+
+    return (
+      opponentRating +
+      handicapRatingEffect(giverRating, game.handicap.type)
+    );
+  }
+
+  // The opponent is the handicap giver. FESA defines the handicap effect
+  // from the giver's rating, and the opponent rating here is the current
+  // post-event rating estimate used by the tournament-wide iteration.
+  return (
+    opponentRating -
+    handicapRatingEffect(opponentRating, game.handicap.type)
+  );
 }
 
 function ratedGamesForPlayer(
@@ -177,7 +223,12 @@ function calculatePlayer(args: {
         throw new Error(`Missing opponent rating for ${opponentId}`);
       }
       return {
-        opponentRating,
+        opponentRating: effectiveOpponentRating({
+          game,
+          player,
+          opponentRating,
+          iterationRatings: args.opponentRatings,
+        }),
         result: playerRelativeResult(game, player.id),
       };
     });
@@ -235,7 +286,12 @@ function calculatePlayer(args: {
 
     const gameResult = standardGameChange({
       playerRating: runningRating,
-      opponentRating,
+      opponentRating: effectiveOpponentRating({
+        game,
+        player,
+        opponentRating,
+        iterationRatings: args.opponentRatings,
+      }),
       result: playerRelativeResult(game, player.id),
       bonusGamesUsed,
     });
