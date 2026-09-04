@@ -336,13 +336,26 @@ export function calculateTournament(
   let previousResults: FesaPlayerResult[] | undefined;
 
   for (let iteration = 0; iteration < MAX_ITERATIONS; iteration += 1) {
-    const results = input.players.map((player) =>
-      calculatePlayer({
+    const workingRatings = new Map(opponentRatings);
+    const results: FesaPlayerResult[] = [];
+
+    // Legacy turnering.lisp updates players sequentially within each
+    // tournament iteration. Later players therefore see already-updated
+    // post-event estimates for earlier players (Gauss-Seidel style),
+    // rather than every player reading the same previous-iteration snapshot.
+    for (const player of input.players) {
+      const result = calculatePlayer({
         player,
         games: input.games,
-        opponentRatings,
-      }),
-    );
+        opponentRatings: workingRatings,
+      });
+
+      results.push(result);
+      workingRatings.set(
+        result.id,
+        result.ratingAfter ?? initialGuess(player),
+      );
+    }
 
     const priorIteration = previousResults;
     if (
@@ -356,14 +369,7 @@ export function calculateTournament(
     }
 
     previousResults = results;
-    opponentRatings = new Map(
-      results.map((result) => [
-        result.id,
-        result.ratingAfter ?? initialGuess(
-          input.players.find((player) => player.id === result.id)!,
-        ),
-      ]),
-    );
+    opponentRatings = workingRatings;
   }
 
   throw new Error(
