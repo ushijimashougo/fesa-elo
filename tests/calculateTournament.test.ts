@@ -62,6 +62,31 @@ describe("calculateTournament", () => {
     expect(result.players[1]?.ratingAfter).toBe(1600);
   });
 
+  it("rejects handicap games until handicap calculation is implemented", () => {
+    expect(() => calculateTournament({
+      players: [
+        {
+          id: "a",
+          state: { rating: 1600, ratedGames: 20, bonusGamesUsed: 20 },
+        },
+        {
+          id: "b",
+          state: { rating: 1600, ratedGames: 20, bonusGamesUsed: 20 },
+        },
+      ],
+      games: [
+        {
+          id: "g1",
+          playerAId: "a",
+          playerBId: "b",
+          result: "A_WIN",
+          rated: true,
+          handicap: "ROOK",
+        },
+      ],
+    })).toThrow(/Handicap calculation is not implemented/);
+  });
+
   it("keeps an unrated non-playing participant unrated", () => {
     const result = calculateTournament({
       players: [
