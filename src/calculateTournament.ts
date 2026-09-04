@@ -69,6 +69,12 @@ function validateInput(input: FesaTournamentInput): void {
 
   const gameIds = new Set<string>();
   for (const game of input.games) {
+    if (game.handicap !== undefined) {
+      throw new Error(
+        `Handicap calculation is not implemented yet (game ${game.id})`,
+      );
+    }
+
     if (gameIds.has(game.id)) {
       throw new Error(`Duplicate game id: ${game.id}`);
     }
