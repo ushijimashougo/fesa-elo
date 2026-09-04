@@ -37,6 +37,12 @@ If there is a difference between:
 
 the difference should be recorded explicitly and resolved rather than silently copying legacy behavior.
 
+## Historical investigation record
+
+Concrete compatibility findings, including the 2018 R135 / company-league reconstruction and the policy for preserving legacy execution evidence, are recorded in:
+
+- [Historical compatibility investigation](./historical-compatibility-investigation.md)
+
 ## Known legacy architecture
 
 The legacy workflow is stateful between tournaments.
