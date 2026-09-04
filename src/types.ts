@@ -26,7 +26,10 @@ export type FesaGame = {
   playerBId: string;
   result: "A_WIN" | "B_WIN" | "DRAW";
   rated: boolean;
-  handicap?: FesaHandicap;
+  handicap?: {
+    type: FesaHandicap;
+    giverId: string;
+  };
 };
 
 export type FesaTournamentInput = {
