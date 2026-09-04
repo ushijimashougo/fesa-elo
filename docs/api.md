@@ -128,7 +128,7 @@ export type FesaPlayerResult = {
   id: string
 
   ratingBefore?: number
-  ratingAfter: number
+  ratingAfter?: number
 
   ratingChange?: number
 
@@ -141,6 +141,7 @@ export type FesaPlayerResult = {
   calculationMethod:
     | "STANDARD"
     | "PERFORMANCE"
+    | "UNCHANGED"
 
   priorRatedGames?: PriorRatedGame[]
 }
@@ -149,6 +150,8 @@ export type FesaPlayerResult = {
 The result should contain enough state for a caller to persist the post-tournament state and pass it into the next tournament without reconstructing internal FESA state from scratch.
 
 For an unrated player, `ratingChange` may be omitted because there is no meaningful numeric pre-rating delta.
+
+If a participant has no rated games in the current tournament, the library returns `calculationMethod: "UNCHANGED"`. An already-rated player keeps the same `ratingAfter`; a player who was unrated remains without a `ratingAfter`.
 
 ## Trace output
 
