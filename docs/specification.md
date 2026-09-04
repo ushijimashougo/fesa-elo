@@ -121,6 +121,8 @@ Once a player is no longer subject to performance rating, individual historical 
 
 ## 7. Prior grade
 
+For compatibility with the legacy `kota/elo_rating` data, the library also accepts 6–8 Dan initial grades using the legacy midpoint values 2540, 2760, and 3000. These are compatibility extensions beyond the currently documented 5 Dan–20 Kyu table.
+
 For a player's first rated tournament, if the player has a recognized prior grade, two synthetic results are included:
 
 - one win,
