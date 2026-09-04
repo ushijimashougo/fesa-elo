@@ -50,9 +50,20 @@ function validateInput(input: FesaTournamentInput): void {
     }
     if (
       player.state.bonusGamesUsed < 0 ||
+      player.state.bonusGamesUsed > 100 ||
       !Number.isInteger(player.state.bonusGamesUsed)
     ) {
       throw new Error(`Invalid bonusGamesUsed for player ${player.id}`);
+    }
+
+    if (
+      player.state.priorRatedGames?.some(
+        (game) =>
+          !Number.isFinite(game.opponentRating) ||
+          game.opponentRating < 1,
+      )
+    ) {
+      throw new Error(`Invalid prior rated game for player ${player.id}`);
     }
   }
 
@@ -132,6 +143,16 @@ function calculatePlayer(args: {
     currentRatedGames: currentGames.length,
     priorResults: priorGames.map((game) => game.result),
   });
+
+  if (
+    usePerformance &&
+    player.state.ratedGames > 0 &&
+    priorGames.length !== player.state.ratedGames
+  ) {
+    throw new Error(
+      `Player ${player.id} requires complete priorRatedGames while performance rating is active`,
+    );
+  }
 
   const ratedGamesBefore = player.state.ratedGames;
   const ratedGamesAfter =
