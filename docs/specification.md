@@ -201,7 +201,13 @@ FESA supports rating adjustment for specified handicaps:
 
 The handicap effect is converted through the FESA grade lower-bound scale and alters the opponent rating used for each side's calculation.
 
-The public API should model handicap explicitly even if the first consuming application does not use it.
+The public API models handicap explicitly as both a handicap type and a giver player ID.
+
+For the handicap giver, the handicap rating effect is added to the opponent rating used in the Elo formula.
+
+For the handicap receiver, the handicap rating effect is subtracted from the opponent rating used in the Elo formula.
+
+The effect is rating-dependent: the giver's rating is mapped onto the FESA lower-bound fractional-grade scale, the handicap grade-equivalent value is subtracted, and the result is mapped back to a rating.
 
 ## 13. Grade and promotion rules
 
