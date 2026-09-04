@@ -158,13 +158,11 @@ function calculatePlayer(args: {
     ];
 
     const ratingAfter = calculatePerformanceRating(allGames);
-    const allRealResults = [...priorGames, ...currentPerformanceGames].map(
-      (game) => game.result,
-    );
+    const allResults = allGames.map((game) => game.result);
     const remainsPerformance =
       ratedGamesAfter < 9 ||
-      allRealResults.every((result) => result === "WIN") ||
-      allRealResults.every((result) => result === "LOSS");
+      allResults.every((result) => result === "WIN") ||
+      allResults.every((result) => result === "LOSS");
 
     return {
       id: player.id,
@@ -181,10 +179,7 @@ function calculatePlayer(args: {
       bonusGamesUsedAfter: player.state.bonusGamesUsed,
       calculationMethod: "PERFORMANCE",
       ...(remainsPerformance
-        ? { priorRatedGames: toPersistedPriorGames([
-            ...priorGames,
-            ...currentPerformanceGames,
-          ]) }
+        ? { priorRatedGames: toPersistedPriorGames(allGames) }
         : {}),
     };
   }
