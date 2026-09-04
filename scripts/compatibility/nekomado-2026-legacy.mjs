@@ -6,7 +6,7 @@ import { calculateTournament } from "../../dist/index.js";
 
 const args = parseArgs(process.argv.slice(2));
 const fixturePath = path.resolve(required(args.fixture, "--fixture"));
-const legacyDir = path.resolve(required(args.legacyDir, "--legacy-dir"));
+const legacyDir = path.resolve(required(args["legacy-dir"], "--legacy-dir"));
 const year = Number(args.year ?? 2026);
 
 const replay = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
