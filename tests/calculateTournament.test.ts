@@ -77,6 +77,56 @@ describe("calculateTournament", () => {
     expect(result.players[0]?.calculationMethod).toBe("UNCHANGED");
   });
 
+  it("rejects incomplete history while performance rating is active", () => {
+    expect(() => calculateTournament({
+      players: [
+        {
+          id: "a",
+          state: { rating: 1500, ratedGames: 5, bonusGamesUsed: 0 },
+        },
+        {
+          id: "b",
+          state: { rating: 1500, ratedGames: 20, bonusGamesUsed: 100 },
+        },
+      ],
+      games: [
+        {
+          id: "g1",
+          playerAId: "a",
+          playerBId: "b",
+          result: "A_WIN",
+          rated: true,
+        },
+      ],
+    })).toThrow(/requires complete priorRatedGames/);
+  });
+
+  it("allows an established imported baseline without historical games", () => {
+    const result = calculateTournament({
+      players: [
+        {
+          id: "a",
+          state: { rating: 1500, ratedGames: 20, bonusGamesUsed: 20 },
+        },
+        {
+          id: "b",
+          state: { rating: 1500, ratedGames: 20, bonusGamesUsed: 20 },
+        },
+      ],
+      games: [
+        {
+          id: "g1",
+          playerAId: "a",
+          playerBId: "b",
+          result: "A_WIN",
+          rated: true,
+        },
+      ],
+    });
+
+    expect(result.players[0]?.calculationMethod).toBe("STANDARD");
+  });
+
   it("creates a performance rating for a first tournament", () => {
     const result = calculateTournament({
       players: [
