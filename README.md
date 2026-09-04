@@ -34,6 +34,7 @@ See:
 - Player identifiers are opaque strings.
 - The caller owns persistence and supplies historical rating state.
 - FESA-specific rules such as performance rating, bonuses, lower limits, prior grades, iterative convergence, and handicap adjustment belong in this library.
+- Handicap-rated games are supported with an explicit handicap giver and the official FESA fractional-grade conversion.
 - Tournament-management concepts such as standings, rounds, tables, registration, participant profiles, or organization-specific rules do not belong in this library.
 - Calculation behavior must be covered by specification tests and legacy compatibility fixtures.
 
