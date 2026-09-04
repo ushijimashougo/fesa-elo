@@ -1,4 +1,8 @@
-import { HARD_RATING_FLOOR, standardGameChange } from "./math.js";
+import {
+  HARD_RATING_FLOOR,
+  roundToNearestEven,
+  standardGameChange,
+} from "./math.js";
 import {
   calculatePerformanceRating,
   priorGradeGames,
@@ -241,7 +245,7 @@ function calculatePlayer(args: {
     bonusGamesUsed = gameResult.bonusGamesUsedAfter;
   }
 
-  const roundedChange = Math.round(accumulatedChange);
+  const roundedChange = roundToNearestEven(accumulatedChange);
   const ratingAfter = Math.max(
     HARD_RATING_FLOOR,
     player.state.rating + roundedChange,
